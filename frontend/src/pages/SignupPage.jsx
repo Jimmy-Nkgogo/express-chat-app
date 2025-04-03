@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link} from "react-router-dom"
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import AuthImagePattern from "../components/AuthImagePattern";
+import toast from "react-hot-toast";
 
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,9 +14,34 @@ const SignupPage = () => {
   });
   const { signup, isSigninUp } = useAuthStore();
 
-  const validateForm = () => {};
+  const validateForm = () => {
+    if (!formData.fullName.trim()) {
+      return toast.error("Full name is required.")
+    }
+    if (!formData.email.trim()) {
+      return toast.error("Email is required.")
+    }
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      return toast.error("Invalid email format.")
+    }
+    if (!formData.password.trim()) {
+      return toast.error("Password is required.")
+    }
+    if (formData.password.length < 6) {
+      return toast.error("Password must be at least 6 characters")
+    }
+    return true;
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const validatedInput = validateForm();
+
+    if (validatedInput) {
+      console.log("reaches here")
+      signup(formData)
+    } 
+    
   };
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -39,7 +66,7 @@ const SignupPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40" />
+                  <User className="w-5 h-5 " stroke="gray" />
                 </div>
                 <input
                   type="text"
